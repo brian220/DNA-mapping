@@ -1,5 +1,5 @@
-#define MATCH 2
-#define MISMATCH 1
+#define MATCH 1
+#define MISMATCH - 1
 #define GAP -2
 #include <iostream>
 #include <vector>
@@ -34,27 +34,34 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
 
   for (int i = 0; i < a.length() + 1; i ++) {
     for (int j = 0; j < b.length() + 1; j ++) {
+      cout << i << j << endl;
       if (i == 0 && j == 0) {
         match_matrix[i][j].num = 0;
       }
       else if (i == 0) {
         match_matrix[i][j].num = match_matrix[i][j - 1].num + gap_score;
         match_matrix[i][j].prev_dir = "Left";
+        //cout << match_matrix[i][j].num << endl;
       }
       else if (j == 0) {
         match_matrix[i][j].num = match_matrix[i - 1][j].num + gap_score;
         match_matrix[i][j].prev_dir = "Up";
+        //cout << match_matrix[i][j].num << endl;
       }
       else {
         int from_left_score = match_matrix[i][j - 1].num + gap_score;
         int from_up_score = match_matrix[i - 1][j].num + gap_score;
         int from_left_up_score = 0;
-        if (a[i] == b[j]){
+        if (a[i - 1] == b[j - 1]){
+          cout << "match:";
+          cout << a[i - 1] << b[j - 1] << endl;
           //match
           from_left_up_score = match_matrix[i - 1][j - 1].num + match_score;
         }
         else {
           //mismatch
+          cout << "mismatch:";
+          cout << a[i - 1] << b[j - 1] << endl;
           from_left_up_score = match_matrix[i - 1][j - 1].num + mismatch_score;
         }
 
@@ -71,7 +78,7 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
         }
         else{
           if (from_up_score > from_left_up_score) {
-            match_matrix[i][j].num = from_left_score;
+            match_matrix[i][j].num = from_up_score;
             match_matrix[i][j].prev_dir = "Up";
           }
           else {
@@ -79,9 +86,12 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
             match_matrix[i][j].prev_dir = "Left Up";
           }
         }
+        cout << from_left_score<< endl;
+        cout << from_up_score << endl;
+        cout << from_left_up_score << endl;
       }
-      print_matrix(match_matrix);
     }
+      print_matrix(match_matrix);
   }
 }
 
@@ -91,8 +101,8 @@ void back_track_matrix(vector<vector<score>> & match_matrix, string a, string b)
   string seq_b;
   seq_a.resize(max(a.length(), b.length()));
   seq_b.resize(max(a.length(), b.length()));
-  int i = a.length() - 1;
-  int j = b.length() - 1;
+  int i = a.length();
+  int j = b.length();
   cout << i << " " << j << endl;
   while (i >= 0 || j >= 0){
     if (match_matrix[i][j].prev_dir == "Left") {
@@ -123,7 +133,7 @@ void back_track_matrix(vector<vector<score>> & match_matrix, string a, string b)
 void needleman_wunsch(string a, string b) {
   vector<vector<score>> match_matrix;
   match_matrix.resize(a.length() + 1);
-  for (int i = 0; i < a.length(); i ++) {
+  for (int i = 0; i < a.length() + 1; i ++) {
     match_matrix[i].resize(b.length() + 1);
   }
   forward_matrix(match_matrix, a, b);
