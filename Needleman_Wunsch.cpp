@@ -1,3 +1,5 @@
+//Implement the needleman_wunsch algorithm by C++
+//without using the similarity matrix 
 #define MATCH 1
 #define MISMATCH - 1
 #define GAP -2
