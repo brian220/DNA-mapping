@@ -18,7 +18,7 @@ class score{
 void print_matrix(vector<vector<score>> & match_matrix){
   for (int i = 0; i < match_matrix.size(); i ++) {
     for (int j = 0; j < match_matrix[0].size(); j ++) {
-      cout << match_matrix[i][j].num << " ";
+      cout << match_matrix[i][j].prev_dir << ", ";
     }
     cout << endl;
   }
@@ -34,40 +34,33 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
 
   for (int i = 0; i < a.length() + 1; i ++) {
     for (int j = 0; j < b.length() + 1; j ++) {
-      cout << i << j << endl;
       if (i == 0 && j == 0) {
         match_matrix[i][j].num = 0;
       }
       else if (i == 0) {
         match_matrix[i][j].num = match_matrix[i][j - 1].num + gap_score;
         match_matrix[i][j].prev_dir = "Left";
-        //cout << match_matrix[i][j].num << endl;
       }
       else if (j == 0) {
         match_matrix[i][j].num = match_matrix[i - 1][j].num + gap_score;
         match_matrix[i][j].prev_dir = "Up";
-        //cout << match_matrix[i][j].num << endl;
       }
       else {
         int from_left_score = match_matrix[i][j - 1].num + gap_score;
         int from_up_score = match_matrix[i - 1][j].num + gap_score;
         int from_left_up_score = 0;
         if (a[i - 1] == b[j - 1]){
-          cout << "match:";
-          cout << a[i - 1] << b[j - 1] << endl;
           //match
           from_left_up_score = match_matrix[i - 1][j - 1].num + match_score;
         }
         else {
           //mismatch
-          cout << "mismatch:";
-          cout << a[i - 1] << b[j - 1] << endl;
           from_left_up_score = match_matrix[i - 1][j - 1].num + mismatch_score;
         }
 
         //compare the max point direction
         if (from_left_score > from_up_score) {
-          if (from_left_score > from_left_up_score) {
+          if (from_left_score >= from_left_up_score) {
             match_matrix[i][j].num = from_left_score;
             match_matrix[i][j].prev_dir = "Left";
           }
@@ -77,7 +70,7 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
           }
         }
         else{
-          if (from_up_score > from_left_up_score) {
+          if (from_up_score >= from_left_up_score) {
             match_matrix[i][j].num = from_up_score;
             match_matrix[i][j].prev_dir = "Up";
           }
@@ -86,12 +79,9 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
             match_matrix[i][j].prev_dir = "Left Up";
           }
         }
-        cout << from_left_score<< endl;
-        cout << from_up_score << endl;
-        cout << from_left_up_score << endl;
       }
     }
-      print_matrix(match_matrix);
+      //print_matrix(match_matrix);
   }
 }
 
@@ -99,31 +89,34 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
 void back_track_matrix(vector<vector<score>> & match_matrix, string a, string b) {
   string seq_a;
   string seq_b;
-  seq_a.resize(max(a.length(), b.length()));
-  seq_b.resize(max(a.length(), b.length()));
+  int match_length = max(a.length(), b.length());
+  seq_a.resize(match_length);
+  seq_b.resize(match_length);
   int i = a.length();
   int j = b.length();
-  cout << i << " " << j << endl;
-  while (i >= 0 || j >= 0){
+  for (;match_length >= 0; match_length --) {
     if (match_matrix[i][j].prev_dir == "Left") {
-      cout << "l" << endl;
-      seq_a[i] = '-';
+      seq_a[match_length - 1] = '-';
+      seq_b[match_length - 1] = b[j - 1];
       j --;
     }
     else if (match_matrix[i][j].prev_dir == "Up") {
-      cout << "u" << endl;
-      seq_b[j] = '-';
+      seq_a[match_length - 1] = a[i - 1];
+      seq_b[match_length - 1] = '-';
       i --;
     }
     else if (match_matrix[i][j].prev_dir == "Left Up") {
-      cout << "lu" << endl;
-      seq_a[i] = a[i];
-      seq_b[j] = b[j];
+      seq_a[match_length - 1] = a[i - 1];
+      seq_b[match_length - 1] = b[j - 1];
       i --;
       j --;
     }
-    if (i == 0 && j == 0) {
-      break;
+    else {
+      if (match_matrix[i][j].prev_dir != "None") {
+        cout << "Error:There is a bug in this code." << endl;
+        cout << "If you find the bug, please contact b608390@gmail.com" << endl;
+      }
+        break;
     }
   }
   cout << "Output sequence A:" << seq_a << endl;
