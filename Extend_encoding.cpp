@@ -21,18 +21,56 @@ class score{
 };
 map <string, unsigned short> string_to_short;
 
-
-//for debug
+//for debug: print the match matrix
 void print_matrix(vector<vector<score>> match_matrix){
   for (int i = 0; i < match_matrix.size(); i ++) {
     for (int j = 0; j < match_matrix[0].size(); j ++) {
-      cout << match_matrix[i][j].prev_dir << ", ";
+      cout << setw(3) << match_matrix[i][j].num << ", ";
     }
     cout << endl;
   }
 }
 
+//compute the score of each bit
+void compute_score(vector <string> seq_a, vector <string> seq_b) {
+  int score = 0;
+  int match_score = MATCH;
+  int mismatch_score = MISMATCH;
+  int gap_score = GAP;
+  for (int i = 0; i < seq_a.size(); i ++) {
+    if (seq_a[i] == seq_b[i]) {
+      score += match_score;
+    }
+    else if (seq_a[i] == "___" || seq_b[i] == "___") {
+      score += gap_score;
+    }
+    else if (seq_a[i] != seq_b[i]) {
+      score += mismatch_score;
+    }
+    else {
+      cout << "Error:There is a bug in this code." << endl;
+      cout << "If you find the bug, please contact b608390@gmail.com, thanks ~" << endl;
+      break;
+    }
+  }
+  cout << "Score: " << score << endl;
+}
 
+//for debug: print the seqence in string type
+void show_sequence_in_string(vector <string> seq) {
+  map <string, unsigned short>::iterator iter;
+  for(int i = 0; i < seq.size(); i ++) {
+    for(iter = string_to_short.begin(); iter != string_to_short.end(); iter ++) {
+      if (to_string(iter -> second) == seq[i]) {
+        cout << setw(5) << iter -> first << " ";
+      }
+    }
+    if (seq[i] == "___") {
+        cout << setw(5) << "___" << " ";
+    }
+  }
+  cout << endl;
+}
 
 //Back track the matrix computing scores, output answers
 void back_track_matrix(vector<vector<score>> match_matrix, vector <unsigned short> a, vector <unsigned short> b) {
@@ -71,16 +109,22 @@ void back_track_matrix(vector<vector<score>> match_matrix, vector <unsigned shor
       }
     }
   }
-  cout << "Sequence A:";
+  cout << "Sequence A(unsigned short):";
   for (int i = 0; i < seq_a.size(); i ++) {
     cout << setw(5) << seq_a[i] << " ";
   }
   cout << endl;
-  cout << "Sequence B:";
+  cout << "Sequence B(unsigned short):";
   for (int i = 0; i < seq_b.size(); i ++) {
     cout << setw(5) << seq_b[i] << " ";
   }
-  //compute_score(seq_a, seq_b);
+  cout << endl << endl;
+  cout << "Sequence A(string):";
+  show_sequence_in_string(seq_a);
+  cout << "Sequence B(string):";
+  show_sequence_in_string(seq_b);
+  cout << endl;
+  compute_score(seq_a, seq_b);
 }
 
 //forward to construct the match matrix
@@ -138,8 +182,10 @@ void forward_matrix(vector<vector<score>> & match_matrix, vector <unsigned short
         }
       }
     }
-      //print_matrix(match_matrix);
   }
+  cout << "Match Matrix: " << endl;
+  print_matrix(match_matrix);
+  cout << endl;
 }
 
 void needleman_wunsch(vector <unsigned short> a, vector <unsigned short> b) {
@@ -161,7 +207,6 @@ void extend_convert(string a, string b) {
     string s;
     ss << a[i];
     ss >> s;
-    cout << s << endl;
     seq_a.push_back(string_to_short[s]);
   }
   for (int i = 0; i < b.length(); i ++) {
@@ -197,6 +242,5 @@ int main() {
   string_to_short.insert(pair<string,  unsigned short>("A", 326));
   string_to_short.insert(pair<string,  unsigned short>("T", 789));
   string_to_short.insert(pair<string,  unsigned short>("U", 899));
-  cout << string_to_short["U"] << endl;
-   ask_for_input();
+  ask_for_input();
 }
