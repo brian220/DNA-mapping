@@ -24,6 +24,31 @@ void print_matrix(vector<vector<score>> & match_matrix){
   }
 }
 
+//compute the score of each bit
+void compute_score(string seq_a, string seq_b) {
+  int score = 0;
+  int match_score = MATCH;
+  int mismatch_score = MISMATCH;
+  int gap_score = GAP;
+  for (int i = 0; i < seq_a.length(); i ++) {
+    if (seq_a[i] == seq_b[i]) {
+      score += match_score;
+    }
+    else if (seq_a[i] == '-' || seq_b[i] == '-') {
+      score += gap_score;
+    }
+    else if (seq_a[i] != seq_b[i]) {
+      score += mismatch_score;
+    }
+    else {
+      cout << "Error:There is a bug in this code." << endl;
+      cout << "If you find the bug, please contact b608390@gmail.com, thanks ~" << endl;
+      break;
+    }
+  }
+  cout << "Score: " << score << endl;
+}
+
 //forward to construct the match matrix
 void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
   int match_score = MATCH;
@@ -89,38 +114,42 @@ void forward_matrix(vector<vector<score>> & match_matrix, string a, string b) {
 void back_track_matrix(vector<vector<score>> & match_matrix, string a, string b) {
   string seq_a;
   string seq_b;
-  int match_length = max(a.length(), b.length());
-  seq_a.resize(match_length);
-  seq_b.resize(match_length);
+  int match_index =  max(a.length(), b.length()) - 1;
+  seq_a.resize(match_index + 1);
+  seq_b.resize(match_index + 1);
   int i = a.length();
   int j = b.length();
-  for (;match_length >= 0; match_length --) {
+  for (;match_index >= 0; match_index --) {
     if (match_matrix[i][j].prev_dir == "Left") {
-      seq_a[match_length - 1] = '-';
-      seq_b[match_length - 1] = b[j - 1];
+      seq_a[match_index] = '-';
+      seq_b[match_index] = b[j - 1];
       j --;
     }
     else if (match_matrix[i][j].prev_dir == "Up") {
-      seq_a[match_length - 1] = a[i - 1];
-      seq_b[match_length - 1] = '-';
+      seq_a[match_index] = a[i - 1];
+      seq_b[match_index] = '-';
       i --;
     }
     else if (match_matrix[i][j].prev_dir == "Left Up") {
-      seq_a[match_length - 1] = a[i - 1];
-      seq_b[match_length - 1] = b[j - 1];
+      seq_a[match_index] = a[i - 1];
+      seq_b[match_index] = b[j - 1];
       i --;
       j --;
     }
     else {
-      if (match_matrix[i][j].prev_dir != "None") {
-        cout << "Error:There is a bug in this code." << endl;
-        cout << "If you find the bug, please contact b608390@gmail.com" << endl;
-      }
+      if (match_matrix[i][j].prev_dir == "None" && i == 0 && j == 0) {
         break;
+      }
+      else {
+        cout << "Error:There is a bug in this code." << endl;
+        cout << "If you find the bug, please contact b608390@gmail.com, thanks ~" << endl;
+        break;
+      }
     }
   }
   cout << "Output sequence A:" << seq_a << endl;
   cout << "Output sequence B:" << seq_b << endl;
+  compute_score(seq_a, seq_b);
 }
 
 void needleman_wunsch(string a, string b) {
